@@ -80,7 +80,7 @@ def list_viewer(wrd_list: list):
 
 
 def get_random_words(lst):
-    w = [random.randint(0, len(lst)) for _ in range(10)]
+    w = [random.randint(0, len(lst)-1) for _ in range(10)]
     return [lst[i] for i in w]
 
 
