@@ -1,11 +1,14 @@
 import random
 import re
 
+
 def get_user_guess(wrd_list: list) -> 'str':
     while True:
-        user_guess = input("Enter the guess or !list to see word list or !q to quit: \n").lower()
+        user_guess = input("\nEnter the guess or !list to see word list or !q to quit: \n").lower()
         if user_guess == "!list":
             list_viewer(wrd_list)
+        elif user_guess == "!q":
+            return user_guess
         if len(user_guess) != 5:
             print(user_guess + " is not a five letter word")
             continue
@@ -26,8 +29,8 @@ def get_user_guess(wrd_list: list) -> 'str':
 def get_game_response() -> 'str':
     p = "[^\/+#]"  # match any characters that are not /, +, or #
     while True:
-        guess_match_rtg = input("Enter / for mismatch, + for full-match, and # for \n"
-                               "letters in wrong position: \n")
+        guess_match_rtg = input("Enter / for mismatch, + for full-match, and # for "
+                                "letters in wrong position: \n")
         if len(guess_match_rtg) != 5:
             print("Too many characters")
             continue
@@ -63,7 +66,7 @@ def list_viewer(wrd_list: list):
         if user_in == "!q":
             break
         elif user_in == "!rand":
-            print(get_random_word(wrd_list))
+            print(get_random_words(wrd_list))
             continue
         user_in = "^" + user_in  # add start of line anchor
         if len(user_in) > 5:
@@ -72,14 +75,13 @@ def list_viewer(wrd_list: list):
         disp_list = [w for w in wrd_list if re.search(user_in, w)]
         print("There are {} words matching the pattern".format(len(disp_list)))
         for i in range(0, len(disp_list), 8):
-            l = disp_list[i:i+8]
+            l = disp_list[i:i + 8]
             print(l)
 
 
-
-def get_random_word(lst):
-    w = random.randint(0, len(lst))
-    return lst[w]
+def get_random_words(lst):
+    w = [random.randint(0, len(lst)) for _ in range(10)]
+    return [lst[i] for i in w]
 
 
 if __name__ == "__main__":
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     active_list = five_letter_words.copy()
     print("There are {} possible five letter words".format(len(active_list)))
 
-    for _ in range(6):
+    for i in range(6):
         user_guess = get_user_guess(active_list)
         if user_guess == "!q":
             print("It was a pleasure!~")
@@ -102,5 +104,8 @@ if __name__ == "__main__":
         guess_match_rtg = get_game_response()
         active_list = get_filtered_wl(user_guess, guess_match_rtg, active_list)
         print("There are {} five letter words remaining".format(len(active_list)))
-        print("Entering word list browser...")
+        print("Entering word list browser...\n")
         list_viewer(active_list)
+
+    if i > 5:
+        print("Ran out of attempts.")
