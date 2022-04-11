@@ -44,13 +44,22 @@ def get_filtered_wl(user_guess: str, guess_match_rtg: str, wrd_list: list) -> 'l
     f1 = wrd_list
     f2 = []
     char_pos = 0
-    exact_pattrn = "." * 5
+
     for c, r in zip(user_guess, guess_match_rtg):
+        exact_pattrn = "." * 5
         char_pos = char_pos + 1
         if r == "/":
-            f2 = [w for w in f1 if c not in w]  # words without non-matching character
+            if user_guess.count(c) > 1:
+                # for repeating characters only eliminate words with non-matching char
+                # at this position
+                exact_pattrn = exact_pattrn[:char_pos - 1] + c + exact_pattrn[char_pos:]
+                f2 = [w for w in f1 if not re.search(exact_pattrn, w)]
+            else:
+                f2 = [w for w in f1 if c not in w]  # words without non-matching character
         elif r == "#":
-            f2 = [w for w in f1 if c in w]  # words with character that is in wrong position
+            # char c is in the word, just not at this position
+            exact_pattrn = exact_pattrn[:char_pos - 1] + "[^" + c + "]" + exact_pattrn[char_pos:]
+            f2 = [w for w in f1 if re.search(exact_pattrn, w)]  # words with character that is in wrong position
         elif r == "+":  # exact match position of char
             exact_pattrn = exact_pattrn[:char_pos - 1] + c + exact_pattrn[char_pos:]
             f2 = [w for w in f1 if re.search(exact_pattrn, w)]
@@ -79,9 +88,23 @@ def list_viewer(wrd_list: list):
             print(l)
 
 
+def word_has_repeated_chars(word: str) -> 'bool':
+    for c in word[:-1]:
+        if word.count(c) > 1:
+            return True
+    return False
+
+
 def get_random_words(lst):
-    w = [random.randint(0, len(lst)-1) for _ in range(10)]
-    return [lst[i] for i in w]
+    if len(lst) <= 10:
+        return lst
+    else:
+        rand_lst = []
+        while len(rand_lst) <= 10:
+            w = lst[random.randint(0, len(lst))]
+            if not word_has_repeated_chars(w):
+                rand_lst.append(w)
+        return rand_lst
 
 
 if __name__ == "__main__":
