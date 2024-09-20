@@ -58,8 +58,8 @@ def get_filtered_wl(user_guess: str, guess_match_rtg: str, wrd_list: list) -> 'l
                 f2 = [w for w in f1 if c not in w]  # words without non-matching character
         elif r == "#":
             # char c is in the word, just not at this position
-            exact_pattrn = exact_pattrn[:char_pos - 1] + "[^" + c + "]" + exact_pattrn[char_pos:]
-            f2 = [w for w in f1 if re.search(exact_pattrn, w)]  # words with character that is in wrong position
+            exact_pattrn = exact_pattrn[:char_pos-1] + "[^" + c + "]" + exact_pattrn[char_pos:]
+            f2 = [w for w in f1 if re.search(exact_pattrn, w) and c in w]  # words with character that is in wrong position
         elif r == "+":  # exact match position of char
             exact_pattrn = exact_pattrn[:char_pos - 1] + c + exact_pattrn[char_pos:]
             f2 = [w for w in f1 if re.search(exact_pattrn, w)]
@@ -70,7 +70,7 @@ def get_filtered_wl(user_guess: str, guess_match_rtg: str, wrd_list: list) -> 'l
 def list_viewer(wrd_list: list):
     user_in = ""
     while user_in != '!q':
-        user_in = input("Enter a pattern to see a list of possible words,\n"
+        user_in = input("Enter a pattern to see a list of possible words. Use a dot to match all characters in the pattern\n"
                         "!rand to get a random suggestion or !q to quit: ")
         if user_in == "!q":
             break
@@ -89,22 +89,21 @@ def list_viewer(wrd_list: list):
 
 
 def word_has_repeated_chars(word: str) -> 'bool':
-    for c in word[:-1]:
-        if word.count(c) > 1:
-            return True
-    return False
-
+  for c in word[:-1]:
+    if word.count(c) > 1:
+      return True
+  return False
 
 def get_random_words(lst):
     if len(lst) <= 10:
-        return lst
+      return lst
     else:
-        rand_lst = []
-        while len(rand_lst) <= 10:
-            w = lst[random.randint(0, len(lst))]
-            if not word_has_repeated_chars(w):
-                rand_lst.append(w)
-        return rand_lst
+      rand_lst = []
+      while len(rand_lst) <= 10:
+        w = lst[random.randint(0, len(lst)-1)]
+        if not word_has_repeated_chars(w):
+          rand_lst.append(w)
+      return rand_lst
 
 
 if __name__ == "__main__":
